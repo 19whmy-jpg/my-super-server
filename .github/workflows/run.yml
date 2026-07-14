@@ -19,9 +19,10 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Download Minecraft Server 1.20.1 & Install Ngrok
+    - name: Download Fabric 1.20.1 & Install Ngrok
       run: |
-        wget https://github.com/maccelerated/minecraft-server-jars/releases/download/1.20.1/server.jar -O server.jar
+        wget https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.1/fabric-installer-1.0.1.jar -O fabric-installer.jar
+        java -jar fabric-installer.jar server -mcversion 1.20.1 -downloadMinecraft
         echo "eula=true" > eula.txt
         
         curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
@@ -41,4 +42,4 @@ jobs:
 
     - name: Run Server with 30GB RAM
       run: |
-        java -Xmx30G -Xms30G -jar server.jar nogui
+        java -Xmx30G -Xms30G -jar fabric-server-launch.jar nogui
