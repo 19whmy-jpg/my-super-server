@@ -15,23 +15,31 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
+    - name: Free Disk Space (To Get 40GB+ Space)
+      run: |
+        echo "=== المساحة قبل التنظيف ==="
+        df -h
+        # حذف الملفات والأدوات غير المستخدمة لتوفير مساحة ضخمة للسيرفر
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        echo "=== المساحة بعد التنظيف (مبروك حصلت على مساحة خارقة!) ==="
+        df -h
+
     - name: Download Fabric 1.20.1 & Create Mods Folder
       run: |
-        # تحميل وتثبيت فابريك
         wget https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.1/fabric-installer-1.0.1.jar -O fabric-installer.jar
         java -jar fabric-installer.jar server -mcversion 1.20.1 -downloadMinecraft
         echo "eula=true" > eula.txt
-        
-        # إنشاء مجلد المودات تلقائياً ليكون جاهزاً لاستقبال المودات
         mkdir -p mods
 
     - name: Install & Start Playit.gg
       run: |
-        # تحميل وتثبيت أداة Playit لربط السيرفر بدون فيزا
         curl -SsL https://playit-cloud.github.io/playit-releases/playit-linux-amd64 -o playit
         chmod +x playit
         
-        # تشغيل الأداة في الخلفية لتوليد الـ IP
         ./playit --secret_path playit.toml &
         sleep 10
         
@@ -41,6 +49,7 @@ jobs:
         echo "2. Open that link in your browser to activate your free server IP."
         echo "=============================================="
 
-    - name: Run Server with 24GB RAM
+    - name: Run Server with 20GB RAM & Multi-threading
       run: |
-        java -Xmx24G -Xms24G -jar fabric-server-launch.jar nogui
+        # تشغيل الجافا بأقصى أداء مع رامات 20 جيجا وخوارزمية معالجة سريعة
+        java -Xmx20G -Xms20G -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32m -jar fabric-server-launch.jar nogui
