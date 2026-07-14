@@ -1,10 +1,6 @@
 name: Minecraft Server 32GB
 on: 
   workflow_dispatch:
-    inputs:
-      ngrok_token:
-        description: 'Paste your Ngrok Authtoken here'
-        required: true
 
 jobs:
   run:
@@ -19,27 +15,32 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Download Fabric 1.20.1 & Install Ngrok
+    - name: Download Fabric 1.20.1 & Create Mods Folder
       run: |
+        # تحميل وتثبيت فابريك
         wget https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.1/fabric-installer-1.0.1.jar -O fabric-installer.jar
         java -jar fabric-installer.jar server -mcversion 1.20.1 -downloadMinecraft
         echo "eula=true" > eula.txt
         
-        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
-        echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
-        sudo apt-get update && sudo apt-get install ngrok
-        ngrok config add-authtoken "${{ github.event.inputs.ngrok_token }}"
+        # إنشاء مجلد المودات تلقائياً ليكون جاهزاً لاستقبال المودات
+        mkdir -p mods
 
-    - name: Start Ngrok Tunnel & Get IP
+    - name: Install & Start Playit.gg
       run: |
-        ngrok tcp 25565 --log=stdout > ngrok.log &
+        # تحميل وتثبيت أداة Playit لربط السيرفر بدون فيزا
+        curl -SsL https://playit-cloud.github.io/playit-releases/playit-linux-amd64 -o playit
+        chmod +x playit
+        
+        # تشغيل الأداة في الخلفية لتوليد الـ IP
+        ./playit --secret_path playit.toml &
         sleep 10
         
         echo "=============================================="
-        echo "🟢 YOUR MINECRAFT SERVER IP IS:"
-        curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url' | sed 's/tcp:\/\///'
+        echo "🟢 TO SETUP YOUR IP:"
+        echo "1. Look at the logs below for a claim link (looks like: https://playit.gg/claim/...)"
+        echo "2. Open that link in your browser to activate your free server IP."
         echo "=============================================="
 
-    - name: Run Server with 16GB RAM
+    - name: Run Server with 24GB RAM
       run: |
-        java -Xmx16G -Xms16G -jar fabric-server-launch.jar nogui
+        java -Xmx24G -Xms24G -jar fabric-server-launch.jar nogui
