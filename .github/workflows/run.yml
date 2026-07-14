@@ -40,6 +40,6 @@ jobs:
         curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url' | sed 's/tcp:\/\///'
         echo "=============================================="
 
-    - name: Run Server with 30GB RAM
+    - name: Run Server with 16GB RAM
       run: |
-        java -Xmx30G -Xms30G -jar fabric-server-launch.jar nogui
+        java -Xmx16G -Xms16G -jar fabric-server-launch.jar nogui
