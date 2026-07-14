@@ -37,9 +37,11 @@ jobs:
 
     - name: Install & Start Playit.gg
       run: |
-        curl -SsL https://playit-cloud.github.io/playit-releases/playit-linux-amd64 -o playit
+        # تحميل الأداة مباشرة من الرابط الرسمي لضمان تشغيلها بدون أخطاء
+        wget -q https://github.com/playit-cloud/playit-agent/releases/download/v0.15.26/playit-linux-amd64 -O playit
         chmod +x playit
         
+        # تشغيل الأداة في الخلفية لتوليد رابط الـ IP
         ./playit --secret_path playit.toml &
         sleep 10
         
