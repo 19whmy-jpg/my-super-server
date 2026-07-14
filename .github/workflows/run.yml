@@ -1,4 +1,3 @@
-
 name: Minecraft Server 32GB
 on: 
   workflow_dispatch:
@@ -22,7 +21,7 @@ jobs:
 
     - name: Download Minecraft Server 1.20.1 & Install Ngrok
       run: |
-        wget https://piston-data.mojang.com/v1/objects/8dd1a2870413c75fcdab3b1e45212644402a226b/server.jar -O server.jar
+        wget https://github.com/maccelerated/minecraft-server-jars/releases/download/1.20.1/server.jar -O server.jar
         echo "eula=true" > eula.txt
         
         curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
@@ -43,4 +42,3 @@ jobs:
     - name: Run Server with 30GB RAM
       run: |
         java -Xmx30G -Xms30G -jar server.jar nogui
-
